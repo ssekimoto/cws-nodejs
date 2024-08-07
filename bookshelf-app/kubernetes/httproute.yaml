@@ -5,7 +5,10 @@ metadata:
   namespace: default
 spec:
   parentRefs:
-  - name: my-gateway
+  - kind: Gateway
+    name: external-http
+  hostnames:
+  - "x.x.com"
   rules:
   - matches:
     - path:
