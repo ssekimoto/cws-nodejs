@@ -7,8 +7,13 @@ RUN sudo apt update && sudo apt install -y gettext-base jq httpie curl ghostscri
 RUN sudo apt-get remove -y nodejs
 
 # 新しいNode.jsのインストール
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
-    sudo apt-get install -y nodejs
+ENV NODE_VERSION 21.11.1
+
+RUN export ARCH=$(uname -m | sed 's/aarch64/arm64/' | sed 's/x86_64/x64/') \
+ && curl -fsSLO --compressed "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
+ && tar -xJf "node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
+ && rm "node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
+ && ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
 # Node.jsのパッケージインストール
 RUN sudo npm install -g jest \
