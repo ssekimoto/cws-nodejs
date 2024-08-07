@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 2 # app.yaml からスケール設定
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app-container
+        image: my-app-image:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef: # ここでConfigMapを参照
+            name: my-app-config # ConfigMapの名前を指定
+        - secretRef: # ここでSecretを参照
+            name: my-app-secret # Secretの名前を指定
+        volumeMounts:
+        - name: static-files
+          mountPath: /usr/src/app/public
+      volumes:
+      - name: static-files
+        emptyDir: {}
