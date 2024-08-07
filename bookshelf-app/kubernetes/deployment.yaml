@@ -1,30 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app
+  name: my-node-app
+  namespace: default
 spec:
-  replicas: 2 # app.yaml からスケール設定
+  replicas: 3
   selector:
     matchLabels:
-      app: my-app
+      app: my-node-app
   template:
     metadata:
       labels:
-        app: my-app
+        app: my-node-app
     spec:
       containers:
-      - name: my-app-container
-        image: my-app-image:latest
+      - name: my-node-container
+        image: my-node-app-image:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 13001  # コンテナ内でリッスンするポートを13001に指定
         envFrom:
-        - configMapRef: # ここでConfigMapを参照
-            name: my-app-config # ConfigMapの名前を指定
-        - secretRef: # ここでSecretを参照
-            name: my-app-secret # Secretの名前を指定
+        - configMapRef:
+            name: my-app-config
+        - secretRef:
+            name: my-app-secret
         volumeMounts:
-        - name: static-files
-          mountPath: /usr/src/app/public
+        - name: google-service-account-volume
+          mountPath: /etc/credentials
+          readOnly: true
       volumes:
-      - name: static-files
-        emptyDir: {}
+      - name: google-service-account-volume
+        secret:
+          secretName: google-service-account
